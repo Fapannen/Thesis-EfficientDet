@@ -12,3 +12,4 @@ wget https://user-images.githubusercontent.com/11736571/77320690-099af300-6d37-1
 
 tar xf efficientdet-${1}.tar.gz
 
+cp ../run_tflite.py .

@@ -12,5 +12,4 @@ To get started:
         ie. `./run_model_example d0 images/img.png`  
     * To convert model to tflite format, run `./convert.sh <version>`  
     * To run inference with converted model, run  
-        `python3 run_tflite.py <version> <path_to_image>`.  
-        ie. `python3 run_tflite.py d0 images/people.jpg`   
+        `python3 run_tflite.py <version> <path_to_image>` 

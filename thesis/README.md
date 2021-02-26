@@ -7,9 +7,9 @@ To get started:
 3) Fetch desired version of EfficientDet with `./download_model <version>`  
    (ie. "./download_model d0")
 4) Work with the model  
-   4.1) To run example demo, run `./run_model_example.sh <version> <path_to_image>`  
+    4.1) To run example demo, run `./run_model_example.sh <version> <path_to_image>`  
         To run original example, set `path_to_image` to `images/img.png`  
         ie. `./run_model_example d0 images/img.png`  
-   4.2) To convert model to tflite format, run `./convert.sh <version>`  
-   4.3) To run inference with converted tflite model, run `python3 run_tflite.py <version> <path_to_image>`
+    4.2) To convert model to tflite format, run `./convert.sh <version>`  
+    4.3) To run inference with converted tflite model, run `python3 run_tflite.py <version> <path_to_image>`
         ie. `python3 run_tflite.py d0 images/people.jpg`   

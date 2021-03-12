@@ -21,11 +21,19 @@ resolutions = {
   "d7" : 1536
 }
 
+def draw_boxes(image, predictions):
+    color = (255, 0, 0)
+    thickness = 2
+    
+    for box in predictions:
+        cv2.rectangle(image, (box[2], box[1]), (box[4], box[3]), color, thickness)
+
+def show_image(image):
+    cv2.imshow("output", image)
+    cv2.waitKey()
+
 version = sys.argv[1]
 
-current_dir = os.getcwd()
-
-dir = os.chdir(os.getcwd() + "/" + version)
 model = "efficientdet-" + version + ".tflite"
 
 interpreter = tf.lite.Interpreter(model_path=model)
@@ -35,11 +43,15 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 input_shape = input_details[0]['shape']
-input_img = cv2.imread(current_dir + "/" + sys.argv[2])
-input_data = cv2.resize(input_img, (resolutions[version], resolutions[version]))
-interpreter.set_tensor(input_details[0]['index'], [input_data])
+input_img = cv2.imread(sys.argv[2])
+input_img = cv2.resize(input_img, (resolutions[version], resolutions[version]))
+interpreter.set_tensor(input_details[0]['index'], [input_img])
 
 interpreter.invoke()
 
 output_data = interpreter.get_tensor(output_details[0]['index'])
-print(output_data)
+
+scored_predictions = [box for box in output_data[0] if box[5] > 0]
+
+draw_boxes(input_img, scored_predictions)
+show_image(input_img)

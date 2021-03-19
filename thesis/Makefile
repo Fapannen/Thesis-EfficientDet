@@ -8,12 +8,13 @@ LIBS=-ltensorflow-lite \
 	-ldl \
 	-lm \
 	-lz
+
 BIN=measure
 
 EXT=../../tensorflow-imx/tensorflow/lite/nnapi/nnapi_implementation.cc
 
-LDOPTS:=-L/home/fapannen/Desktop/git/Thesis-EfficientDet/thesis
+LDOPTS:=-L.
 
 
 measure: $(BIN).cpp
-	$(CXX) -O2 $(INC) $(EXT) $(BIN).cpp $(LIBPATH) $(LIBS) -o measure
+	$(CXX) -O2 $(INC) $(EXT) $(BIN).cpp $(LDOPTS) $(LIBS) -o measure

@@ -20,3 +20,17 @@ To get started:
     * To run inference with converted model, run  
         `python3 run_tflite.py <version> <path_to_image>` in version directory  
         
+# Run on device
+
+1) Convert your desired version of EfficientDet (via steps above) to .tflite file and copy this file to your target device.
+2) Setup Cross-Compile environment
+   (In my case by sourcing a configuration file)
+3) Build Tensorflow Lite static library `libtensorflow-lite.a` with Cross Compile settings
+   * Makefile is located at `<tensorflow_root>/tensorflow/lite/tools/make`
+   * **I had to disable NNAPI support!**. In Makefile, on line 268: Change `BUILD_WITH_NNAPI ?= true` to `BUILD_WITH_NNAPI ?= false`
+   * run `make <CC Config>` 
+   * `libtensorflow-lite.a` will be located at `<tensorflow_root>/tensorflow/lite/tools/make/gen/<ARCH>/lib`
+4) Make sure the application is linked to `libtensorflow-lite.a`
+   * You can copy `libtensorflow-lite.a` to this directory.
+5) `make measure` Should now produce an executable binary `measure`.
+6) Copy `measure` on your device and execute as `measure <model_file>.tflite` 

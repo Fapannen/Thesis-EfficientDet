@@ -17,4 +17,4 @@ LDOPTS:=-L.
 
 
 measure: $(BIN).cpp
-	$(CXX) -O2 $(INC) $(EXT) $(BIN).cpp $(LDOPTS) $(LIBS) -o measure
+	$(CXX) -O2 $(INC) $(EXT) $(BIN).cpp $(LDOPTS) $(LIBS) -o $(BIN)

@@ -33,4 +33,4 @@ To get started:
 4) Make sure the application is linked to `libtensorflow-lite.a`
    * You can copy `libtensorflow-lite.a` to this directory.
 5) `make measure` Should now produce an executable binary `measure`.
-6) Copy `measure` on your device and execute as `measure <model_file>.tflite` 
+6) Copy `measure` on your device and execute as `./measure <model_file>.tflite` 

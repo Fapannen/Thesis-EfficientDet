@@ -31,6 +31,7 @@ To get started:
    * run `make <CC Config>` 
    * `libtensorflow-lite.a` will be located at `<tensorflow_root>/tensorflow/lite/tools/make/gen/<ARCH>/lib`  
    * You can choose to build shared library `libtensorflowlite.so` with bazel instead. Bazel is official Tensorflow building tool, therefore there should be less issues. After you build the shared library, you need to copy it to target device. (Not tested during runtime)   
+   * See `https://www.tensorflow.org/lite/guide/build_arm#c_library`
 4) Make sure the application is linked to `libtensorflow-lite.a` (or to `libtensorflowlite.so` if you built with bazel)
    * You can copy `libtensorflow-lite.a` to this directory.
 5) `make measure` Should now produce an executable binary `measure`.

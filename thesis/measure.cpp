@@ -20,7 +20,8 @@
 #define D7 1536
 
 // Set which model to work with
-int MODEL = D0;
+int MODEL_RES = D0;
+int CHANNELS  = 3;
 
 void printVector(const std::vector<float>& v)
 {
@@ -53,15 +54,23 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "minimal <tflite model> <path to image>\n");
     return 1;
   }
+
   const char* filename  = argv[1];
   const char* imagepath = argv[2];
 
+  cv::Mat img;
+  cv::Mat resized_img;
+
   // Open image
-  cv::Mat img = cv::imread(imagepath, cv::IMREAD_COLOR);
+  // Opening using imread will have continuous memory
+  img = cv::imread(imagepath, cv::IMREAD_COLOR);
   if (img.empty()){
       fprintf(stderr, "Failed to read image ...\n");
       return -1;
   }
+
+  // Resize input image to fit the model
+  cv::resize(img, resized_img, cv::Size(MODEL_RES, MODEL_RES), 0, 0, cv::INTER_CUBIC);
 
   // Load model
   std::unique_ptr<tflite::FlatBufferModel> model =
@@ -97,16 +106,8 @@ int main(int argc, char* argv[]) {
   TfLiteTensor* tensor = interpreter->input_tensor(0);
   uint8_t* input = reinterpret_cast<uint8_t*>(tensor->data.raw);
 
-  for (int ch = 0; ch < 3; ++ch)
-  {
-    for (int i = 0; i < MODEL; ++i)
-    {
-      for (int j = 0; j < MODEL; ++j)
-      {
-        input[(MODEL * MODEL * ch) + MODEL * i + j] = static_cast<uint8_t>((i * j) % 32);
-      }
-    }
-  }
+  // Copy image data to input tensor
+  memcpy((void*)input, (void*) resized_img.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(uint8_t));
 
   // Run inference
   TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);

@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include "opencv2/opencv.hpp"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
@@ -48,11 +49,19 @@ void printVector(const std::vector<float>& v)
   }
 
 int main(int argc, char* argv[]) {
-  if (argc != 2) {
-    fprintf(stderr, "minimal <tflite model>\n");
+  if (argc != 3) {
+    fprintf(stderr, "minimal <tflite model> <path to image>\n");
     return 1;
   }
-  const char* filename = argv[1];
+  const char* filename  = argv[1];
+  const char* imagepath = argv[2];
+
+  // Open image
+  cv::Mat img = cv::imread(imagepath, cv::IMREAD_COLOR);
+  if (img.empty()){
+      fprintf(stderr, "Failed to read image ...\n");
+      return -1;
+  }
 
   // Load model
   std::unique_ptr<tflite::FlatBufferModel> model =

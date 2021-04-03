@@ -33,6 +33,7 @@ To get started:
    * You can choose to build shared library `libtensorflowlite.so` with bazel instead. Bazel is official Tensorflow building tool, therefore there should be less issues. After you build the shared library, you need to copy it to target device. (Not tested during runtime)   
    * See `https://www.tensorflow.org/lite/guide/build_arm#c_library`
 4) Make sure the application is linked to `libtensorflow-lite.a` (or to `libtensorflowlite.so` if you built with bazel)
-   * You can copy `libtensorflow-lite.a` to this directory.
+   * You can copy `libtensorflow-lite.a` to `c++/libs` directory.
 5) `make measure` Should now produce an executable binary `measure`.
-6) Copy `measure` on your device and execute as `./measure <model_file>.tflite` 
+6) Copy `measure` on your device and execute as `./measure <model_file>.tflite <image_input>` 
+   * Model will produce `out.png` in the current directory.

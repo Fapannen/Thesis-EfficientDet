@@ -28,10 +28,11 @@ LIBS=-ltensorflow-lite \
 
 BIN=measure
 
-EXT=../../tensorflow-imx/tensorflow/lite/nnapi/nnapi_implementation.cc
+EXT=../../../tensorflow-imx/tensorflow/lite/nnapi/nnapi_implementation.cc
 
-LDOPTS:=-L.
+LDOPTS:=-L./libs
 
+UTILS=utils
 
-measure: $(BIN).cpp
-	$(CXX) -O2 $(INC) $(EXT) $(BIN).cpp $(LDOPTS) $(LIBS) -o $(BIN)
+measure: $(BIN).cpp $(UTILS).cpp $(UTILS).hpp
+	$(CXX) -O2 $(INC) $(EXT) $(UTILS).cpp $(BIN).cpp $(LDOPTS) $(LIBS) -o $(BIN)

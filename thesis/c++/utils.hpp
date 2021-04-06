@@ -30,6 +30,15 @@ void log(std::ofstream& stream, T value)
   stream << value << std::endl;
 }
 
+template <typename T>
+void log(std::ofstream& stream, std::vector<T> values)
+{
+	for (T& val : values)
+	{
+		stream << val << std::endl;
+	}
+}
+
 /*  Create Logging file name from model name and current time
 	model: string path from current directory, ie. "efficientdet-d0.tflite"
 	time : current time in string format. Expected result from getTime()
@@ -40,6 +49,9 @@ std::string createLogFileName(const std::string& model,const std::string& time);
 // Get time in form of a string for logging purposes
 std::string getTime();
 
+
+// Get memory usage from /proc tree
+void logMemoryUsage(std::ofstream& stream);
 
 // Prints vector content to standard output
 void printVector(const std::vector<float>& v);

@@ -22,6 +22,7 @@
 #define D7 1536
 
 #define LOG true
+#define MEASURE_TIME true
 
 // Set which model to work with
 int MODEL_RES = D0;
@@ -45,11 +46,16 @@ int main(int argc, char* argv[]) {
   std::string time      = getTime();
   std::string logFile   = createLogFileName(std::string(modelFile), time);
 
-  if(LOG){
-    logging = std::ofstream(logFile);
+  std::chrono::time_point<std::chrono::high_resolution_clock> fullTimeStart;
+  std::chrono::time_point<std::chrono::high_resolution_clock> fullTimeEnd;
+  std::chrono::time_point<std::chrono::high_resolution_clock> inferenceTimeStart;
+  std::chrono::time_point<std::chrono::high_resolution_clock> inferenceTimeEnd;
 
-    log<int>(logging, "TEST", 5);
-  }
+  logging = std::ofstream(logFile);
+
+  logMemoryUsage(logging);
+
+  fullTimeStart = std::chrono::high_resolution_clock::now();
   
   cv::Mat img;
 
@@ -78,7 +84,10 @@ int main(int argc, char* argv[]) {
 
   // Allocate tensor buffers.
   TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
+
   printf("=== Pre-invoke Interpreter State ===\n");
+
+  logMemoryUsage(logging);
 
   // Input tensor is "uint8 [1, MODEL, MODEL, 3]"
   TfLiteTensor* tensor = interpreter->input_tensor(0);
@@ -87,8 +96,15 @@ int main(int argc, char* argv[]) {
   // Copy image data to input tensor
   memcpy((void*)input, (void*) resizedImg.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(uint8_t));
 
-  // Run inference
-  TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+  inferenceTimeStart = std::chrono::high_resolution_clock::now();
+
+  if(interpreter->Invoke() != kTfLiteOk){
+    printf("Error happened in Invoke()! Logs will be invalid!\n");
+    return -1;
+  }
+
+  inferenceTimeEnd = std::chrono::high_resolution_clock::now();
+
   printf("\n\n=== Post-invoke Interpreter State ===\n");
 
   // Output tensor is "float32 [1, 100, 7]"
@@ -98,9 +114,17 @@ int main(int argc, char* argv[]) {
 
   drawBoundingBoxes(outputs, resizedImg);
 
-  if(LOG){
-    logging.close();
-  }
+  fullTimeEnd = std::chrono::high_resolution_clock::now();
+
+  auto fullTimeDuration      = std::chrono::duration_cast<std::chrono::milliseconds>(fullTimeEnd - fullTimeStart);
+  auto inferenceTimeDuration = std::chrono::duration_cast<std::chrono::milliseconds>(inferenceTimeEnd - inferenceTimeStart);
+
+  log<int>(logging, "Full execution time in milliseconds", fullTimeDuration.count());
+  log<float>(logging, "Full execution time in seconds", fullTimeDuration.count() / static_cast<float>(1000));
+  log<int>(logging, "Inference time in milliseconds", inferenceTimeDuration.count());
+  log<float>(logging, "Inference time in seconds", inferenceTimeDuration.count() / static_cast<float>(1000));
+
+  logging.close();
 
   printf("Done\n");
 

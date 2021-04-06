@@ -4,6 +4,7 @@
 #include <ctime>
 #include <regex>
 #include <fstream>
+#include <unistd.h>
 #include "utils.hpp"
 #include "opencv2/opencv.hpp"
 // to be cleaned, prolly dont need all
@@ -12,6 +13,21 @@
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 
+void logMemoryUsage(std::ofstream& stream)
+{
+  std::ifstream memInfo("/proc/self/smaps_rollup");
+  std::string line;
+
+  log<std::string>(stream, std::string("Memory usage\n"));
+
+  while(std::getline(memInfo, line)){
+    log<std::string>(stream, line);
+  }
+
+  stream << std::endl;
+
+  memInfo.close();
+}
 
 std::string createLogFileName(const std::string& model,const std::string& time)
 {

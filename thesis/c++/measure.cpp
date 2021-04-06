@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include "opencv2/opencv.hpp"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
@@ -20,6 +21,8 @@
 #define D6 1280
 #define D7 1536
 
+#define LOG true
+
 // Set which model to work with
 int MODEL_RES = D0;
 int CHANNELS  = 3;
@@ -30,30 +33,39 @@ int CHANNELS  = 3;
 
 int main(int argc, char* argv[]) {
   if (argc != 3) {
-    fprintf(stderr, "minimal <tflite model> <path to image>\n");
+    fprintf(stderr, "measure <tflite model> <path to image>\n");
     return 1;
   }
 
-  const char* filename  = argv[1];
-  const char* imagepath = argv[2];
+  std::ofstream logging;
 
+  const char* modelFile = argv[1];
+  const char* imageFile = argv[2];
+
+  std::string time      = getTime();
+  std::string logFile   = createLogFileName(std::string(modelFile), time);
+
+  if(LOG){
+    logging = std::ofstream(logFile);  
+  }
+  
   cv::Mat img;
 
   // Open image
   // Opening using imread will have continuous memory
-  img = cv::imread(imagepath, cv::IMREAD_COLOR);
+  img = cv::imread(imageFile, cv::IMREAD_COLOR);
   if (img.empty()){
       fprintf(stderr, "Failed to read image ...\n");
       return -1;
   }
 
   // Resize input image to fit the model
-  cv::Mat resized_img;
-  cv::resize(img, resized_img, cv::Size(MODEL_RES, MODEL_RES), 0, 0, cv::INTER_CUBIC);
+  cv::Mat resizedImg;
+  cv::resize(img, resizedImg, cv::Size(MODEL_RES, MODEL_RES), 0, 0, cv::INTER_CUBIC);
 
   // Load model
   std::unique_ptr<tflite::FlatBufferModel> model =
-      tflite::FlatBufferModel::BuildFromFile(filename);
+      tflite::FlatBufferModel::BuildFromFile(modelFile);
   TFLITE_MINIMAL_CHECK(model != nullptr);
 
   tflite::ops::builtin::BuiltinOpResolver resolver;
@@ -71,7 +83,7 @@ int main(int argc, char* argv[]) {
   uint8_t* input = reinterpret_cast<uint8_t*>(tensor->data.raw);
 
   // Copy image data to input tensor
-  memcpy((void*)input, (void*) resized_img.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(uint8_t));
+  memcpy((void*)input, (void*) resizedImg.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(uint8_t));
 
   // Run inference
   TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
@@ -82,7 +94,11 @@ int main(int argc, char* argv[]) {
 
   auto outputs = getOutputVectors(outtensor, 100, 7);
 
-  drawBoundingBoxes(outputs, resized_img);
+  drawBoundingBoxes(outputs, resizedImg);
+
+  if(LOG){
+    logging.close();
+  }
 
   printf("Done\n");
 

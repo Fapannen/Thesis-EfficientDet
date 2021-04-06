@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <ctime>
+#include <regex>
 #include "utils.hpp"
 #include "opencv2/opencv.hpp"
 // to be cleaned, prolly dont need all
@@ -7,6 +10,31 @@
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
+
+std::string createLogFileName(const std::string& model,const std::string& time)
+{
+  std::string modelCopy(model);
+  std::string timeCopy(time);
+
+  std::string prep        = modelCopy.append(timeCopy);
+  std::string prep2       = std::regex_replace(prep,  std::regex("\\.tflite"), "-");
+  std::string prep3       = std::regex_replace(prep2, std::regex("--"), "-");
+  std::string prep4       = prep3.substr(0, prep3.size() - 1);
+  std::string logFileName = prep4.append(".txt");
+
+  return logFileName; 
+}
+
+std::string getTime()
+{
+  std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  std::string res(std::ctime(&time));
+
+  // Replace all spaces by '-'
+  std::replace(res.begin(), res.end(), ' ', '-');
+
+  return res;
+}
 
 void printVector(const std::vector<float>& v)
 {

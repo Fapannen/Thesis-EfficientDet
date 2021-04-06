@@ -10,6 +10,16 @@
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 
+/*  Create Logging file name from model name and current time
+	model: string path from current directory, ie. "efficientdet-d0.tflite"
+	time : current time in string format. Expected result from getTime()
+*/
+std::string createLogFileName(const std::string& model,const std::string& time);
+
+
+// Get time in form of a string for logging purposes
+std::string getTime();
+
 
 // Prints vector content to standard output
 void printVector(const std::vector<float>& v);

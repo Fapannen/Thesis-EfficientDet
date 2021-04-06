@@ -10,6 +10,26 @@
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 
+/*	Log a metric into logging file. 
+	stream: output file stream to write into. Assumed to be open.
+	metric: string representing the measured feature, ie. memory usage
+	value : generic value of the metric
+
+	Implementation needs to be in header file because of visibility
+*/
+template <typename T>
+void log(std::ofstream& stream, const char* metric, T value)
+{
+  stream << metric << ": " << value << std::endl;
+}
+
+// Similar function to log just value
+template <typename T>
+void log(std::ofstream& stream, T value)
+{
+  stream << value << std::endl;
+}
+
 /*  Create Logging file name from model name and current time
 	model: string path from current directory, ie. "efficientdet-d0.tflite"
 	time : current time in string format. Expected result from getTime()

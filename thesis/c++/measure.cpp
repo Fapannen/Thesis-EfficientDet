@@ -46,7 +46,9 @@ int main(int argc, char* argv[]) {
   std::string logFile   = createLogFileName(std::string(modelFile), time);
 
   if(LOG){
-    logging = std::ofstream(logFile);  
+    logging = std::ofstream(logFile);
+
+    log<int>(logging, "TEST", 5);
   }
   
   cv::Mat img;

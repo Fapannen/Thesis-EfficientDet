@@ -1,7 +1,7 @@
 INC=-I/home/fapannen/Desktop/git/tensorflow-imx \
 	-I/home/fapannen/Desktop/git/tensorflow-imx/tensorflow/lite/tools/make/downloads/flatbuffers/include
 
-LIBS=-ltensorflow-lite \
+LIBS=-ltensorflowlite \
 	-lstdc++ \
 	-lpthread \
 	-lrt \
@@ -35,4 +35,4 @@ LDOPTS:=-L./libs
 UTILS=utils
 
 measure: $(BIN).cpp $(UTILS).cpp $(UTILS).hpp
-	$(CXX) -O2 $(INC) $(EXT) $(UTILS).cpp $(BIN).cpp $(LDOPTS) $(LIBS) -o $(BIN)
+	$(CXX) -std=c++17 -O2 $(INC) $(EXT) $(UTILS).cpp $(BIN).cpp $(LDOPTS) $(LIBS) -o $(BIN)

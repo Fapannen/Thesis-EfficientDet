@@ -13,12 +13,29 @@
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 
+cv::Mat readImage(const std::string& imgPath, const int width, const int height)
+{
+  cv::Mat img;
+  cv::Mat resizedImg;
+
+  // Open image
+  // Opening using imread will have continuous memory
+  img = cv::imread(imgPath, cv::IMREAD_COLOR);
+  if (img.empty()){
+      fprintf(stderr, "Failed to read image ...\n");
+      return img;
+  }
+
+  // Resize input image to fit the model
+  cv::resize(img, resizedImg, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+
+  return resizedImg;
+}
+
 void logMemoryUsage(std::ofstream& stream)
 {
   std::ifstream memInfo("/proc/self/smaps_rollup");
   std::string line;
-
-  log<std::string>(stream, std::string("Memory usage\n"));
 
   while(std::getline(memInfo, line)){
     log<std::string>(stream, line);
@@ -52,6 +69,20 @@ std::string getTime()
   std::replace(res.begin(), res.end(), ' ', '-');
 
   return res;
+}
+
+std::chrono::milliseconds timedInference(tflite::Interpreter* interpreter)
+{
+    auto inferenceTimeStart = std::chrono::high_resolution_clock::now();
+
+    if(interpreter->Invoke() != kTfLiteOk){
+      printf("Error happened in Invoke()! Logs will be invalid!\n");
+      return std::chrono::duration_cast<std::chrono::milliseconds>(inferenceTimeStart - inferenceTimeStart);
+    }
+
+    auto inferenceTimeEnd = std::chrono::high_resolution_clock::now();
+
+    return std::chrono::duration_cast<std::chrono::milliseconds>(inferenceTimeEnd - inferenceTimeStart);
 }
 
 void printVector(const std::vector<float>& v)

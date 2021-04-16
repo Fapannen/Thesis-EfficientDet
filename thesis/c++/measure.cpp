@@ -5,11 +5,15 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <filesystem> // inference all images in a file
 #include "opencv2/opencv.hpp"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
+#include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
+#include "tensorflow/lite/tools/delegates/delegate_provider.h"
+#include "tensorflow/lite/tools/evaluation/utils.h"
 #include "utils.hpp"
 
 #define D0 512
@@ -21,27 +25,21 @@
 #define D6 1280
 #define D7 1536
 
-#define LOG true
-#define MEASURE_TIME true
-
 // Set which model to work with
-int MODEL_RES = D0;
+int MODEL_RES;
 int CHANNELS  = 3;
 
-// An application to measure <everything>.
-//
-// Usage: measure <model> <input_image>
-
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    fprintf(stderr, "measure <tflite model> <path to image>\n");
+  if (argc != 4) {
+    fprintf(stderr, "measure <tflite model> <path to images folder> <input image size>\n");
     return 1;
   }
 
-  std::ofstream logging;
-
   const char* modelFile = argv[1];
-  const char* imageFile = argv[2];
+  const char* imageDir  = argv[2];
+  const char* modelRes  = argv[3];
+
+  MODEL_RES = std::stoi(std::string(modelRes));
 
   std::string time      = getTime();
   std::string logFile   = createLogFileName(std::string(modelFile), time);
@@ -51,25 +49,12 @@ int main(int argc, char* argv[]) {
   std::chrono::time_point<std::chrono::high_resolution_clock> inferenceTimeStart;
   std::chrono::time_point<std::chrono::high_resolution_clock> inferenceTimeEnd;
 
-  logging = std::ofstream(logFile);
+  std::ofstream logging = std::ofstream(logFile);
 
+  log<std::string>(logging, std::string("Memory usage at the beginning (model not loaded)"));
   logMemoryUsage(logging);
 
   fullTimeStart = std::chrono::high_resolution_clock::now();
-  
-  cv::Mat img;
-
-  // Open image
-  // Opening using imread will have continuous memory
-  img = cv::imread(imageFile, cv::IMREAD_COLOR);
-  if (img.empty()){
-      fprintf(stderr, "Failed to read image ...\n");
-      return -1;
-  }
-
-  // Resize input image to fit the model
-  cv::Mat resizedImg;
-  cv::resize(img, resizedImg, cv::Size(MODEL_RES, MODEL_RES), 0, 0, cv::INTER_CUBIC);
 
   // Load model
   std::unique_ptr<tflite::FlatBufferModel> model =
@@ -82,47 +67,58 @@ int main(int argc, char* argv[]) {
   builder(&interpreter);
   TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
+  interpreter->SetNumThreads(4);
+
+  log<std::string>(logging, std::string("Memory usage after loading the model"));
+  logMemoryUsage(logging);
+
   // Allocate tensor buffers.
   TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
 
-  printf("=== Pre-invoke Interpreter State ===\n");
-
+  log<std::string>(logging, std::string("Memory usage after allocating model tensors"));
   logMemoryUsage(logging);
 
-  // Input tensor is "uint8 [1, MODEL, MODEL, 3]"
-  TfLiteTensor* tensor = interpreter->input_tensor(0);
-  uint8_t* input = reinterpret_cast<uint8_t*>(tensor->data.raw);
+  log<std::string>(logging, "----------------------------------------------------------------------------");
 
-  // Copy image data to input tensor
-  memcpy((void*)input, (void*) resizedImg.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(uint8_t));
+  TfLiteTensor* inTensor  = interpreter->input_tensor(0);
+  TfLiteTensor* outTensor = interpreter->output_tensor(0);
 
-  inferenceTimeStart = std::chrono::high_resolution_clock::now();
+  uint8_t* input = reinterpret_cast<uint8_t*>(inTensor->data.raw);
 
-  if(interpreter->Invoke() != kTfLiteOk){
-    printf("Error happened in Invoke()! Logs will be invalid!\n");
-    return -1;
+  cv::Mat img;
+  cv::Mat resizedImg;
+
+  std::vector<std::vector<float>> outputs;
+
+  int imgCnt = 0;
+
+  // Evaluate on test dataset
+  for (const auto & entry : std::filesystem::directory_iterator(imageDir))
+  {
+    img = readImage(entry.path(), MODEL_RES, MODEL_RES);
+
+    memcpy((void*)input, (void*) img.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(uint8_t));
+
+    logMemoryUsage(logging);
+
+    auto inferenceTimeDuration = timedInference(interpreter.get());
+
+    outputs = getOutputVectors(outTensor, 100, 7);
+
+    log<std::string>(logging, "Image file", std::string(entry.path()));
+    log<int>(logging, "Inference time in ms", static_cast<int>(inferenceTimeDuration.count()));
+    logOutputs<float>(logging, outputs);
+    log<std::string>(logging, "----------------------------------------------------------------------------");
+
+    std::cout << "Images processed: " << imgCnt++ << std::endl;
   }
-
-  inferenceTimeEnd = std::chrono::high_resolution_clock::now();
-
-  printf("\n\n=== Post-invoke Interpreter State ===\n");
-
-  // Output tensor is "float32 [1, 100, 7]"
-  TfLiteTensor* outtensor = interpreter->output_tensor(0);
-
-  auto outputs = getOutputVectors(outtensor, 100, 7);
-
-  drawBoundingBoxes(outputs, resizedImg);
 
   fullTimeEnd = std::chrono::high_resolution_clock::now();
 
-  auto fullTimeDuration      = std::chrono::duration_cast<std::chrono::milliseconds>(fullTimeEnd - fullTimeStart);
-  auto inferenceTimeDuration = std::chrono::duration_cast<std::chrono::milliseconds>(inferenceTimeEnd - inferenceTimeStart);
+  auto fullTimeDuration = std::chrono::duration_cast<std::chrono::milliseconds>(fullTimeEnd - fullTimeStart);
 
-  log<int>(logging, "Full execution time in milliseconds", fullTimeDuration.count());
+  log<long>(logging, "Full execution time in milliseconds", static_cast<long>(fullTimeDuration.count()));
   log<float>(logging, "Full execution time in seconds", fullTimeDuration.count() / static_cast<float>(1000));
-  log<int>(logging, "Inference time in milliseconds", inferenceTimeDuration.count());
-  log<float>(logging, "Inference time in seconds", inferenceTimeDuration.count() / static_cast<float>(1000));
 
   logging.close();
 

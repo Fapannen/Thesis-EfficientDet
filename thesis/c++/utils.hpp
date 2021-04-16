@@ -10,6 +10,13 @@
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 
+
+std::chrono::milliseconds timedInference(tflite::Interpreter* interpreter);
+
+/*Read an image from imgPath and resize it to WIDTH x HEIGHT */
+cv::Mat readImage(const std::string& imgPath, const int width, const int height);
+
+
 /*	Log a metric into logging file. 
 	stream: output file stream to write into. Assumed to be open.
 	metric: string representing the measured feature, ie. memory usage
@@ -36,6 +43,24 @@ void log(std::ofstream& stream, std::vector<T> values)
 	for (T& val : values)
 	{
 		stream << val << std::endl;
+	}
+}
+
+template <typename T>
+void logOutputs(std::ofstream& stream, std::vector<std::vector<T>> values)
+{
+	for(std::vector<T>& vec : values)
+	{
+		std::string out("[ ");
+		for(size_t i = 0; i < vec.size(); i++){
+			out.append(std::to_string(vec[i]));
+			if(i != vec.size() - 1){
+				out.append(", ");	
+			}
+		}
+		out.append(" ]");
+
+		stream << out << std::endl;
 	}
 }
 

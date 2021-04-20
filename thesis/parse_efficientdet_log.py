@@ -4,6 +4,8 @@ Parsing script for efficientdet log.
 Expects path to logfile as argument
 """
 import sys
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
 
 ##################################################################
 ##                                                              ##
@@ -47,6 +49,10 @@ def get_entries(file):
 		inference_entries.append(InferenceEntry(inference))
 
 	return init_memory, inference_entries
+
+# Build JSON in order to evaluate on COCO dataset
+def build_json(inferenceEntries, filename):
+	pass
 
 
 

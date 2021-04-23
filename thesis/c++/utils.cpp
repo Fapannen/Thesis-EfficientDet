@@ -17,6 +17,7 @@ cv::Mat readImage(const std::string& imgPath, const int width, const int height)
 {
   cv::Mat img;
   cv::Mat resizedImg;
+  cv::Mat RGBImg;
 
   // Open image
   // Opening using imread will have continuous memory
@@ -26,8 +27,10 @@ cv::Mat readImage(const std::string& imgPath, const int width, const int height)
       return img;
   }
 
+  cv::cvtColor(img, RGBImg, cv::COLOR_BGR2RGB);
+
   // Resize input image to fit the model
-  cv::resize(img, resizedImg, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+  cv::resize(RGBImg, resizedImg, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
 
   return resizedImg;
 }

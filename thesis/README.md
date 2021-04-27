@@ -34,6 +34,5 @@ To get started:
    * See `https://www.tensorflow.org/lite/guide/build_arm#c_library`
 4) Make sure the application is linked to `libtensorflow-lite.a` (or to `libtensorflowlite.so` if you built with bazel)
    * You can copy `libtensorflow-lite.a` to `c++/libs` directory.
-5) `make measure` Should now produce an executable binary `measure`.
-6) Copy `measure` on your device and execute as `./measure <model_file>.tflite <image_input>` 
-   * Model will produce `out.png` in the current directory.
+5) `make efficientdet` or `make mobilenet` Should now produce an executable binary `measure_[efficientdet | mobilenet]`.
+6) Copy `measure_<model>` on your device and execute as `./measure_<model> <model_file>.tflite <images_folder> <input_image_size>` 

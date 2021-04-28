@@ -43,8 +43,12 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 input_shape = input_details[0]['shape']
+output_shape = output_details[0]['shape']
+print(input_shape)
+print(output_shape)
 input_img = cv2.imread(sys.argv[2])
 input_img = cv2.resize(input_img, (resolutions[version], resolutions[version]))
+input_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)
 interpreter.set_tensor(input_details[0]['index'], [input_img])
 
 interpreter.invoke()

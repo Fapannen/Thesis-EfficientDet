@@ -71,9 +71,11 @@ def build_json(inferenceEntries, model, filename=JSON_FILENAME):
 		found = False
 		imgwidth = 0
 		imgheight = 0
+		imgid = None
 		for img in test_dev['images']:
 			if int(img['id']) == int(inference.image):
 				found = True
+				imgid = img['id']
 				imgwidth = int(img['width'])
 				imgheight = int(img['height'])
 				#print("Found ID ", inference.image)
@@ -118,9 +120,13 @@ def overall_stats(inferences):
 	min_memory = math.inf
 	max_memory = 0
 
-	acc_detections = 0
-	min_detections = math.inf
-	max_detections = 0
+	acc_detections_all = 0
+	acc_detections_25  = 0
+	acc_detections_40  = 0
+	acc_detections_50  = 0
+	acc_detections_75  = 0 
+	min_detections     = math.inf
+	max_detections     = 0
 
 	acc_inference_time = 0
 	min_inference_time = math.inf
@@ -131,7 +137,11 @@ def overall_stats(inferences):
 		min_memory =  inf.memory.rss if inf.memory.rss < min_memory else min_memory
 		max_memory =  inf.memory.rss if inf.memory.rss > max_memory else max_memory
 
-		acc_detections += inf.num_detections
+		acc_detections_all += inf.num_detections
+		acc_detections_75  += len([item for item in inf.unique_output if item[5] > 0.75])
+		acc_detections_50  += len([item for item in inf.unique_output if item[5] > 0.50])
+		acc_detections_40  += len([item for item in inf.unique_output if item[5] > 0.40])
+		acc_detections_25  += len([item for item in inf.unique_output if item[5] > 0.25])
 		min_detections =  inf.num_detections if inf.num_detections < min_detections else min_detections
 		max_detections =  inf.num_detections if inf.num_detections > max_detections else max_detections
 
@@ -140,7 +150,11 @@ def overall_stats(inferences):
 		max_inference_time =  inf.timems if inf.timems > max_inference_time else max_inference_time
 
 	avg_memory         = acc_memory / len(inferences)
-	avg_detections     = acc_detections / len(inferences) 
+	avg_detections_all = acc_detections_all / len(inferences)
+	avg_detections_75  = acc_detections_75 / len(inferences)
+	avg_detections_50  = acc_detections_50 / len(inferences)
+	avg_detections_40  = acc_detections_40 / len(inferences)
+	avg_detections_25  = acc_detections_25 / len(inferences) 
 	avg_inference_time = acc_inference_time / len(inferences)
 
 	print()
@@ -153,9 +167,15 @@ def overall_stats(inferences):
 
 	print('Detections summary')
 	print('------------------')
-	print('Average number of detections: ', avg_detections)
-	print('Minimum number of detections: ', min_detections)
-	print('Maximum number of detections: ', max_detections)
+	print('Minimum number of detections (no threshold): ', min_detections)
+	print('Maximum number of detections (no threshold): ', max_detections)
+	print()
+	print('Average number of detections (>  0): ', avg_detections_all)
+	print('Average number of detections (> 25): ', avg_detections_25)
+	print('Average number of detections (> 40): ', avg_detections_40)
+	print('Average number of detections (> 50): ', avg_detections_50)
+	print('Average number of detections (> 75): ', avg_detections_75)
+
 	print()
 
 	print('Inference time summary')
@@ -235,7 +255,7 @@ class InferenceEntry:
 
 		memory_footprint = split[0]
 		inference_log    = split[1].split('\n')
-		
+
 		self.memory         = MemoryEntry(memory_footprint)
 		self.image          = get_id(inference_log[0].split('/')[1].split('.jpg')[0])
 		self.timems         = int(inference_log[1].split(': ')[1])
@@ -243,6 +263,10 @@ class InferenceEntry:
 		self.output         = load_outputs(inference_log[2:-1])
 		self.unique_output  = make_unique(self.output)
 		self.num_detections = len(self.unique_output)
+
+		if(self.image == int(581918)):
+			print('log:')
+			print(inference_log)
 		
 ##################################################################
 ##                                                              ##

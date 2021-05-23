@@ -8,7 +8,7 @@ import sys
 import os
 
 # Different versions of EfficientDet need different inputs
-# Map the versions to deisred inputs
+# Map the versions to desired inputs
 
 resolutions = {
   "d0" : 512,
@@ -18,7 +18,10 @@ resolutions = {
   "d4" : 1024,
   "d5" : 1280,
   "d6" : 1280,
-  "d7" : 1536
+  "d7" : 1536,
+  "lite0" : 320,
+  "lite2" : 448,
+  "lite3" : 512
 }
 
 def draw_boxes(image, predictions):
@@ -58,4 +61,5 @@ output_data = interpreter.get_tensor(output_details[0]['index'])
 scored_predictions = [box for box in output_data[0] if box[5] > 0]
 
 draw_boxes(input_img, scored_predictions)
+input_img = cv2.cvtColor(input_img, cv2.COLOR_RGB2BGR)
 show_image(input_img)

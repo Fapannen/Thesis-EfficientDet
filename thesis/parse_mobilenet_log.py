@@ -17,6 +17,7 @@ import math
 ##                                                              ##
 ##################################################################
 
+
 SEP='----------------------------------------------------------------------------'
 JSON_FILENAME='json_outputs_mobilenet.json'
 
@@ -26,7 +27,6 @@ def parse_Kb(string):
 
 # Convert text outputs to arrays of floats
 def load_outputs(outputs, num_detections=100):
-
 	boxes = []
 	for i in range(0, 100):	
 		output = outputs[i][2:-2]
@@ -95,7 +95,7 @@ def build_json(inferenceEntries, model, filename=JSON_FILENAME):
 			print("ID ", inference.image, " not found")
 			continue
 
-		for i in range(10):
+		for i in range(5):
 			temp = {
 				'image_id'    : inference.image,
 				'category_id' : int(inference.classes[i][0]) + 1,
@@ -132,8 +132,9 @@ def overall_stats(inferences):
 
 	acc_detections_all = 0
 	acc_detections_25  = 0
+	acc_detections_40  = 0
 	acc_detections_50  = 0
-	acc_detections_75  = 0 
+	acc_detections_75  = 0
 	min_detections     = math.inf
 	max_detections     = 0
 
@@ -149,6 +150,7 @@ def overall_stats(inferences):
 		acc_detections_all += inf.num_detections
 		acc_detections_75  += len([item for item in inf.confidences if item[0] > 0.75])
 		acc_detections_50  += len([item for item in inf.confidences if item[0] > 0.50])
+		acc_detections_40  += len([item for item in inf.confidences if item[0] > 0.40])
 		acc_detections_25  += len([item for item in inf.confidences if item[0] > 0.25])
 		min_detections     =  inf.num_detections if inf.num_detections < min_detections else min_detections
 		max_detections     =  inf.num_detections if inf.num_detections > max_detections else max_detections
@@ -162,6 +164,7 @@ def overall_stats(inferences):
 	avg_detections_all = acc_detections_all / len(inferences)
 	avg_detections_75  = acc_detections_75 / len(inferences)
 	avg_detections_50  = acc_detections_50 / len(inferences)
+	avg_detections_40  = acc_detections_40 / len(inferences)
 	avg_detections_25  = acc_detections_25 / len(inferences) 
 	avg_inference_time = acc_inference_time / len(inferences)
 
@@ -175,10 +178,12 @@ def overall_stats(inferences):
 
 	print('Detections summary')
 	print('------------------')
-	print('Average number of detections: ', avg_detections_all)
-	print('Average number of detections (> 75): ', avg_detections_75)
-	print('Average number of detections (> 50): ', avg_detections_50)
+	print('Average number of detections (>  0): ', avg_detections_all)
 	print('Average number of detections (> 25): ', avg_detections_25)
+	print('Average number of detections (> 40): ', avg_detections_40)
+	print('Average number of detections (> 50): ', avg_detections_50)
+	print('Average number of detections (> 75): ', avg_detections_75)
+
 	print()
 
 	print('Inference time summary')

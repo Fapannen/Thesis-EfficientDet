@@ -34,6 +34,7 @@ To get started:
    (In my case by sourcing a configuration file)
    (Skip if building for general-purpose desktop computer)
 3) Build Tensorflow Lite static library `libtensorflow-lite.a` with Cross Compile settings
+   * (I have provided one I built for my desktop computer, but I am not sure whether it will work for other computers, too. I recommend trying with prebuilt one and otherwise building your own)
    * Clone tensorflow repository, e.g. `https://github.com/tensorflow/tensorflow.git`
    * Install bazel build tool (https://docs.bazel.build/versions/master/install-ubuntu.html)
    * Install flatbuffers (https://stackoverflow.com/questions/55394537/how-to-install-flatc-and-flatbuffers-on-linux-ubuntu)
@@ -48,7 +49,7 @@ To get started:
    * By default, the application expects `libtensorflow-lite.a` file to be present in `/libs` directory. If you have built the shared library, please edit Makefile to look for `libtensorflowlite` instead of `libtensorflow-lite` 
 5)  Install OpenCV library (https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
    * You don't need to build opencv-contrib.
-   * After running `make install`, run `export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib` so that linker can find newly build libraries.
+   * After running `make install`, run `export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib` so that linker can find newly built libraries.
 6) `make efficientdet` or `make mobilenet` in `Thesis-EfficientDet/thesis/c++` directory Should now produce an executable binary `measure_[efficientdet | mobilenet]`.
 7) Copy `measure_<model>` on your device and execute as `./measure_<model> <model_file>.tflite <images_folder> <input_image_size>` 
    * if executing on general-purpose computer, copy all necessary files to one directory to ensure the app runs smoothly and the guide remains accurace.

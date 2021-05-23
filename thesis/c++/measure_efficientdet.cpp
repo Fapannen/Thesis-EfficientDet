@@ -10,10 +10,6 @@
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
-#include "tensorflow/lite/optional_debug_tools.h"
-#include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
-#include "tensorflow/lite/tools/delegates/delegate_provider.h"
-#include "tensorflow/lite/tools/evaluation/utils.h"
 #include "utils.hpp"
 
 #define D0 512
@@ -79,9 +75,9 @@ int main(int argc, char* argv[]) {
   logMemoryUsage(logging);
 
   log<std::string>(logging, "----------------------------------------------------------------------------");
-
-  TfLiteTensor* inTensor  = interpreter->input_tensor(0);
-  TfLiteTensor* outTensor = interpreter->output_tensor(0);
+  
+  TfLiteTensor* inTensor   = interpreter->input_tensor(0);
+  TfLiteTensor* outTensor  = interpreter->output_tensor(0);
 
   uint8_t* input = reinterpret_cast<uint8_t*>(inTensor->data.raw);
 

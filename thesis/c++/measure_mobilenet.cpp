@@ -10,10 +10,6 @@
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
-#include "tensorflow/lite/optional_debug_tools.h"
-#include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
-#include "tensorflow/lite/tools/delegates/delegate_provider.h"
-#include "tensorflow/lite/tools/evaluation/utils.h"
 #include "utils.hpp"
 
 // Set which model to work with
@@ -104,13 +100,17 @@ int main(int argc, char* argv[]) {
   {
     img = readImage(entry.path(), MODEL_RES, MODEL_RES);
 
-    img.convertTo(floatImg, CV_32FC3);
+    img.convertTo(img, CV_32FC3, 2/255.0);
 
-    memcpy((void*)input, (void*) floatImg.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(float));
+    img = img - cv::Scalar(1, 1, 1);
+
+
+    memcpy((void*)input, (void*) img.data, MODEL_RES * MODEL_RES * CHANNELS * sizeof(float));
 
     logMemoryUsage(logging);
 
     auto inferenceTimeDuration = timedInference(interpreter.get());
+
 
 	float* numD = reinterpret_cast<float*>(outTensorNumBoxes->data.raw);
 	

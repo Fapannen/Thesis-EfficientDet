@@ -1,6 +1,6 @@
 # Thesis-EfficientDet
 
-Prerequisites: git, opencv-python, python3.7, python3.7-pip (upgrade if necessary `python3.7 -m pip install --upgrade pip`. If you encounter some issues, this might solve some.)
+**Prerequisites**: git, opencv-python, python3.7, python3.7-pip (upgrade if necessary `python3.7 -m pip install --upgrade pip`. If you encounter some issues, this might solve some.)
 
 To get started:
  

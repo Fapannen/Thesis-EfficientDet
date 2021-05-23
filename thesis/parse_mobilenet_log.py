@@ -1,11 +1,10 @@
 """
-Parsing script for efficientdet log.
+Parsing script for mobilenet log. Produces a json output which can be submitted to COCO 
+evaluation server.
 
-Expects path to logfile as argument
+Expects to be called in format "python3.7 parse_mobilenet_log.py <log_file_path> <input_img_size>"
 """
 import sys
-from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
 import json
 import math
 
@@ -49,7 +48,7 @@ def load_outputs(outputs, num_detections=100):
 
 # Retrieve MemoryEntry and InferenceEntry entries from log
 def get_entries(file):
-	entries = file.read().split(SEP)
+	entries = file.read().split(SEP)[:-1]
 
 	init_state = entries[0]
 	inferences = entries[1:]

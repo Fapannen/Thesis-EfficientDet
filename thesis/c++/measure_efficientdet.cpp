@@ -5,23 +5,14 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <filesystem> // inference all images in a file
+#include <experimental/filesystem> // inference all images in a file.
 #include "opencv2/opencv.hpp"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "utils.hpp"
 
-#define D0 512
-#define D1 640
-#define D2 768
-#define D3 896
-#define D4 1024
-#define D5 1280
-#define D6 1280
-#define D7 1536
-
-// Set which model to work with
+// Set what resolution to work with
 int MODEL_RES;
 int CHANNELS  = 3;
 
@@ -88,8 +79,8 @@ int main(int argc, char* argv[]) {
 
   int imgCnt = 0;
 
-  // Evaluate on test dataset
-  for (const auto & entry : std::filesystem::directory_iterator(imageDir))
+  // Evaluate on all images in provided directory
+  for (const auto & entry : std::experimental::filesystem::directory_iterator(imageDir))
   {
     img = readImage(entry.path(), MODEL_RES, MODEL_RES);
 

@@ -1,11 +1,10 @@
 """
-Parsing script for efficientdet log.
+Parsing script for efficientdet log. Produces a json output which can be submitted to COCO 
+evaluation server.
 
-Expects path to logfile as argument
+Expects to be called in format "python3.7 parse_efficientdet_log.py <log_file_path> <input_img_size>"
 """
 import sys
-from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
 import json
 import math
 
@@ -37,7 +36,7 @@ def load_outputs(outputs):
 
 # Retrieve MemoryEntry and InferenceEntry entries from log
 def get_entries(file):
-	entries = file.read().split(SEP)
+	entries = file.read().split(SEP)[:-1]
 
 	init_state = entries[0]
 	inferences = entries[1:]
@@ -53,6 +52,10 @@ def get_entries(file):
 
 	return init_memory, inference_entries
 
+# Useless function when evaluating with official hyperparameter settings.
+# In the provided checkpoint, only detections with > 0.40 confidence
+# are listed. This function was supposed to extract them in a more
+# compact format.
 def make_unique(outputs):
 	uniques = []
 	for output in outputs:
@@ -114,7 +117,7 @@ def get_id(image_number):
 
 	return int(res)
 
-
+# Computes and prints overall stats to std output.
 def overall_stats(inferences):
 	acc_memory = 0
 	min_memory = math.inf
@@ -263,10 +266,6 @@ class InferenceEntry:
 		self.output         = load_outputs(inference_log[2:-1])
 		self.unique_output  = make_unique(self.output)
 		self.num_detections = len(self.unique_output)
-
-		if(self.image == int(581918)):
-			print('log:')
-			print(inference_log)
 		
 ##################################################################
 ##                                                              ##

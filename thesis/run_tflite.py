@@ -29,7 +29,7 @@ def draw_boxes(image, predictions):
     thickness = 2
     
     for box in predictions:
-        cv2.rectangle(image, (box[2], box[1]), (box[4], box[3]), color, thickness)
+        cv2.rectangle(image, (int(box[2]), int(box[1])), (int(box[4]), int(box[3])), color, thickness)
 
 def show_image(image):
     cv2.imshow("output", image)
@@ -62,4 +62,5 @@ scored_predictions = [box for box in output_data[0] if box[5] > 0]
 
 draw_boxes(input_img, scored_predictions)
 input_img = cv2.cvtColor(input_img, cv2.COLOR_RGB2BGR)
-show_image(input_img)
+
+cv2.imwrite('out.jpg', input_img)

@@ -5,14 +5,14 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <filesystem> // inference all images in a file
+#include <experimental/filesystem> // inference all images in a file
 #include "opencv2/opencv.hpp"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "utils.hpp"
 
-// Set which model to work with
+// Set which resolution to work with
 int MODEL_RES;
 int CHANNELS  = 3;
 
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
   int numDetections = 0;
 
   // Evaluate on test dataset
-  for (const auto & entry : std::filesystem::directory_iterator(imageDir))
+  for (const auto & entry : std::experimental::filesystem::directory_iterator(imageDir))
   {
     img = readImage(entry.path(), MODEL_RES, MODEL_RES);
 

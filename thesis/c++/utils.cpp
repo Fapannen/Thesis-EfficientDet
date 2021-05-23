@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include "utils.hpp"
 #include "opencv2/opencv.hpp"
-// to be cleaned, prolly dont need all
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
@@ -27,6 +26,7 @@ cv::Mat readImage(const std::string& imgPath, const int width, const int height)
       return img;
   }
 
+  // OpenCV loads images in BGR format. image has to be converted to RGB.
   cv::cvtColor(img, RGBImg, cv::COLOR_BGR2RGB);
 
   // Resize input image to fit the model
@@ -35,6 +35,7 @@ cv::Mat readImage(const std::string& imgPath, const int width, const int height)
   return resizedImg;
 }
 
+// Read memory statistics from /proc/self/smaps_rollup
 void logMemoryUsage(std::ofstream& stream)
 {
   std::ifstream memInfo("/proc/self/smaps_rollup");
@@ -49,6 +50,7 @@ void logMemoryUsage(std::ofstream& stream)
   memInfo.close();
 }
 
+// Build the output log filename for further manipulation
 std::string createLogFileName(const std::string& model,const std::string& time)
 {
   std::string modelCopy(model);
@@ -63,6 +65,7 @@ std::string createLogFileName(const std::string& model,const std::string& time)
   return logFileName; 
 }
 
+// Return current time in a string format
 std::string getTime()
 {
   std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -74,6 +77,7 @@ std::string getTime()
   return res;
 }
 
+// Performs a single inference with time measurement. returns the duration
 std::chrono::milliseconds timedInference(tflite::Interpreter* interpreter)
 {
     auto inferenceTimeStart = std::chrono::high_resolution_clock::now();
@@ -119,6 +123,7 @@ std::vector<std::vector<float>> getOutputVectors(const TfLiteTensor* tensor_ptr,
   return outputs;
 }
 
+// Debugging function
 void drawBoundingBoxes(const std::vector<std::vector<float>>& outputs, cv::Mat& image)
 {
   std::vector<std::vector<float>> boxesToDraw;

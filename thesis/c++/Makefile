@@ -1,16 +1,16 @@
-INC=-I/home/fapannen/Desktop/git/tensorflow-imx \
-	-I/home/fapannen/Desktop/git/tensorflow-imx/tensorflow/lite/tools/make/downloads/flatbuffers/include
-
-LIBS=-ltensorflowlite \
+INC=-I/mnt/c/Users/Owner/Desktop/git/tensorflow \
+	-I/mnt/c/Users/Owner/Desktop/git/tensorflow/tensorflow/lite/tools/make/downloads/flatbuffers/include \
+	-I/usr/local/include/opencv4
+	
+LIBS=-ltensorflow-lite \
 	-lstdc++ \
+	-lstdc++fs \
 	-lpthread \
 	-lrt \
 	-ldl \
 	-lm \
 	-lz \
-	-lopencv_shape \
 	-lopencv_stitching \
-	-lopencv_superres \
 	-lopencv_calib3d \
 	-lopencv_features2d \
 	-lopencv_highgui \
@@ -22,7 +22,7 @@ LIBS=-ltensorflowlite \
 
 BIN=measure
 
-EXT=../../../tensorflow-imx/tensorflow/lite/nnapi/nnapi_implementation.cc
+EXT=../../../tensorflow/tensorflow/lite/nnapi/nnapi_implementation.cc
 
 LDOPTS:=-L./libs
 

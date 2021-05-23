@@ -9,7 +9,7 @@ To get started:
 3) Go to automl/efficientdet directory
 4) python3.7 -m pip install numpy
 5) python3.7 -m pip install -r requirements.txt (will install tensorflow 2.5 if no tensorflow is installed on the system, different than what is used in the work but that should not cause any trouble. The command will result in an error with `pycocotools` but we do not need that package. The package is for offline evaluation of models, but test-dev2017 does not have public annotations and therefore offline evaluation is not possible.)
-6) go to Thesis-EfficientDet/thesis directory
+6) Go to Thesis-EfficientDet/thesis directory
 6) Fetch desired version of EfficientDet with `./download_model <version>`  
    (ie. "./download_model d0"). (Models downloaded in this way are not the final trained checkpoints. They reach lower scores, but in terms of an example execution, they are identical. If you insist on using the best-performing models, download them from official EfficientDet repository.)
 7) Work with the model  

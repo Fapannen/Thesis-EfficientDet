@@ -48,11 +48,12 @@ To get started:
    * You can copy `libtensorflow-lite.a` to `Thesis-EfficientDet/thesis/c++/libs` directory.
    * By default, the application expects `libtensorflow-lite.a` file to be present in `/libs` directory. If you have built the shared library, please edit Makefile to look for `libtensorflowlite` instead of `libtensorflow-lite` 
 5)  Install OpenCV library (https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
-   * You don't need to build opencv-contrib.
-   * After running `make install`, run `export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib` so that linker can find newly built libraries.
+    * You don't need to build opencv-contrib.
+    * After running `make install`, run `export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib` so that linker can find newly built libraries.
+6) Before running `make` please edit first two `INC` and `EXT` paths so that they point to tensorflow git repository on your computer.
 6) `make efficientdet` or `make mobilenet` in `Thesis-EfficientDet/thesis/c++` directory Should now produce an executable binary `measure_[efficientdet | mobilenet]`.
 7) Copy `measure_<model>` on your device and execute as `./measure_<model> <model_file>.tflite <images_folder> <input_image_size>` 
-   * if executing on general-purpose computer, copy all necessary files to one directory to ensure the app runs smoothly and the guide remains accurace.
+   * if executing on general-purpose computer, copy all necessary files to one directory.
 8) Model runs inference on all files in `<images_folder>` directory. An output log is produced in current directory.
 
 # Evaluate the results

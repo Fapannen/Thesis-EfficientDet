@@ -1,10 +1,9 @@
-INC=-I/mnt/c/Users/Owner/Desktop/git/tensorflow \
-	-I/mnt/c/Users/Owner/Desktop/git/tensorflow/tensorflow/lite/tools/make/downloads/flatbuffers/include \
+INC=-I/home/fapannen/Desktop/git/tensorflow \
+	-I/home/fapannen/Desktop/git/tensorflow/tensorflow/lite/tools/make/downloads/flatbuffers/include \
 	-I/usr/local/include/opencv4
 	
 LIBS=-ltensorflow-lite \
 	-lstdc++ \
-	-lstdc++fs \
 	-lpthread \
 	-lrt \
 	-ldl \
@@ -34,3 +33,5 @@ efficientdet: $(BIN)_efficientdet.cpp $(UTILS).cpp $(UTILS).hpp
 mobilenet: $(BIN)_mobilenet.cpp $(UTILS).cpp $(UTILS).hpp
 	$(CXX) -std=c++17 -O2 $(INC) $(EXT) $(UTILS).cpp $(BIN)_mobilenet.cpp $(LDOPTS) $(LIBS) -o $(BIN)_mobilenet
 
+efficientdet_keras: $(BIN)_efficientdet_keras_quant.cpp $(UTILS).cpp $(UTILS).hpp
+	$(CXX) -std=c++17 -O2 $(INC) $(EXT) $(UTILS).cpp $(BIN)_efficientdet_keras_quant.cpp $(LDOPTS) $(LIBS) -o $(BIN)_efficientdet_keras_quant

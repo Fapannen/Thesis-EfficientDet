@@ -10,6 +10,7 @@
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 
+int parseModelRes(const std::string& modelName);
 
 std::chrono::milliseconds timedInference(tflite::Interpreter* interpreter);
 

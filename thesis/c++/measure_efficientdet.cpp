@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <experimental/filesystem> // inference all images in a file.
+#include <filesystem> // inference all images in a file.
 #include "opencv2/opencv.hpp"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
@@ -18,15 +18,14 @@ int CHANNELS  = 3;
 
 int main(int argc, char* argv[]) {
   if (argc != 4) {
-    fprintf(stderr, "measure <tflite model> <path to images folder> <input image size>\n");
+    fprintf(stderr, "measure <tflite model> <path to images folder>\n");
     return 1;
   }
 
   const char* modelFile = argv[1];
   const char* imageDir  = argv[2];
-  const char* modelRes  = argv[3];
 
-  MODEL_RES = std::stoi(std::string(modelRes));
+  MODEL_RES = parseModelRes(std::string(modelFile));
 
   std::string time      = getTime();
   std::string logFile   = createLogFileName(std::string(modelFile), time);
@@ -80,7 +79,7 @@ int main(int argc, char* argv[]) {
   int imgCnt = 0;
 
   // Evaluate on all images in provided directory
-  for (const auto & entry : std::experimental::filesystem::directory_iterator(imageDir))
+  for (const auto & entry : std::filesystem::directory_iterator(imageDir))
   {
     img = readImage(entry.path(), MODEL_RES, MODEL_RES);
 

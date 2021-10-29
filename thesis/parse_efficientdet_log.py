@@ -7,6 +7,7 @@ Expects to be called in format "python3.7 parse_efficientdet_log.py <log_file_pa
 import sys
 import json
 import math
+import argparse
 
 ##################################################################
 ##                                                              ##
@@ -58,9 +59,9 @@ def get_entries(file):
 # compact format.
 def make_unique(outputs):
 	uniques = []
-	for output in outputs:
-		if output[5] > 0 and output not in uniques:
-			uniques.append(output)
+	for i in range(max_dets):
+		if outputs[i][5] > score_th and outputs[i] not in uniques:
+			uniques.append(outputs[i])
 		else:
 			break
 
@@ -275,8 +276,21 @@ class InferenceEntry:
 ##                                                              ##
 ##################################################################
 
-logpath = sys.argv[1]
-model   = int(sys.argv[2])
+parser = argparse.ArgumentParser(description='EfficientDet output parsing')
+
+parser.add_argument('--data', help='Path to output file', required=True)
+parser.add_argument('--max_detections', help='Maximum number of detections', default=100, required=False)
+parser.add_argument('--res', help='Resolution that the model used, ie 320 if efficientdet-lite0', required=True)
+parser.add_argument('--score_thresh', help='Score threshold under which detections to discard', default=0.0, required=False)
+
+args = vars(parser.parse_args())
+
+logpath  = args["data"]
+model    = int(args["res"])
+max_dets = int(args["max_detections"])
+
+# Not used at the moment
+score_th = args["score_thresh"]
 
 with open(logpath, 'r') as logfile:
 	init_memory, inference_entries = get_entries(logfile)

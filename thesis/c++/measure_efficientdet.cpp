@@ -17,7 +17,7 @@ int MODEL_RES;
 int CHANNELS  = 3;
 
 int main(int argc, char* argv[]) {
-  if (argc != 4) {
+  if (argc != 3) {
     fprintf(stderr, "measure <tflite model> <path to images folder>\n");
     return 1;
   }

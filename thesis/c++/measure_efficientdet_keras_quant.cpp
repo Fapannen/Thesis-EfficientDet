@@ -17,16 +17,15 @@ int MODEL_RES;
 int CHANNELS  = 3;
 
 int main(int argc, char* argv[]) {
-  if (argc != 4) {
-    fprintf(stderr, "measure <tflite model> <path to images folder> <input image size>\n");
+  if (argc != 3) {
+    fprintf(stderr, "measure <tflite model> <path to images folder>\n");
     return 1;
   }
 
   const char* modelFile = argv[1];
   const char* imageDir  = argv[2];
-  const char* modelRes  = argv[3];
 
-  MODEL_RES = std::stoi(std::string(modelRes));
+  MODEL_RES = parseModelRes(std::string(modelFile));
 
   std::string time      = getTime();
   std::string logFile   = createLogFileName(std::string(modelFile), time);
@@ -102,6 +101,15 @@ int main(int argc, char* argv[]) {
     classes = getOutputVectors(outClassTensor, 100, 1);
     scores  = getOutputVectors(outScoreTensor, 100, 1);
     numdet  = getOutputVectors(outClassTensor, 1, 1);
+
+    // Scale to original image for better postprocessing
+    for (int i = 0; i < static_cast<int>(boxes.size()); ++i)
+    {
+      for (int j = 0; j < static_cast<int>(boxes[i].size()); ++j)
+      {
+        boxes[i][j] = boxes[i][j] * MODEL_RES;
+      }
+    }
 
     for (int i = 0; i < 100; ++i)
     {

@@ -28,8 +28,8 @@ int parseModelRes(const std::string& modelName)
     {"efficientdet-lite1",  384},
     {"efficientdet-lite2",  448},
     {"efficientdet-lite3",  512},
-    {"efficientdet-lite3x", 512},
-    {"efficientdet-lite4",  512}};
+    {"efficientdet-lite3x", 640},
+    {"efficientdet-lite4",  640}};
 
     for (const auto &mapping : efficientDetResMap)
     {
